@@ -1,4 +1,4 @@
-import { TaskPriority, TaskStatus } from "@/app/generated/prisma/client";
+import { TaskPriority, TaskStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   findBestMemberForTask,
