@@ -10,6 +10,15 @@ export async function POST() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Get the user from database
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
     // Get all teams and their members with task counts
     const teams = await prisma.team.findMany({
       include: {
@@ -40,6 +49,15 @@ export async function POST() {
       // Find overloaded members (currentTasks > capacity)
       const overloadedMembers = team.members.filter(
         (member) => member.tasks.length > member.capacity
+      );
+
+      console.log(
+        `Team: ${team.name}, Overloaded members:`,
+        overloadedMembers.map((m) => ({
+          name: m.name,
+          tasks: m.tasks.length,
+          capacity: m.capacity,
+        }))
       );
 
       if (overloadedMembers.length === 0) continue;
@@ -94,7 +112,7 @@ export async function POST() {
               taskId: task.id,
               action: `Reassigned from ${overloadedMember.name} to ${targetMember.name}`,
               description: `Task "${task.title}" reassigned from ${overloadedMember.name} to ${targetMember.name}`,
-              userId: userId,
+              userId: user.id,
             },
           });
 

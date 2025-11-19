@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -175,7 +176,7 @@ export default function ProjectDetailsPage() {
       setFormData({
         title: task.title,
         description: task.description || "",
-        assignedToId: task.assignedToId || "",
+        assignedToId: task.assignedToId || "unassigned",
         priority: task.priority,
         status: task.status,
         dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
@@ -186,7 +187,7 @@ export default function ProjectDetailsPage() {
       setFormData({
         title: "",
         description: "",
-        assignedToId: "",
+        assignedToId: "unassigned",
         priority: "MEDIUM",
         status: "PENDING",
         dueDate: "",
@@ -209,6 +210,8 @@ export default function ProjectDetailsPage() {
 
       const body: Record<string, unknown> = {
         ...formData,
+        assignedToId:
+          formData.assignedToId === "unassigned" ? "" : formData.assignedToId,
         projectId: params.id,
         forceAssign,
       };
@@ -572,14 +575,19 @@ export default function ProjectDetailsPage() {
               <Select
                 value={formData.assignedToId}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, assignedToId: value })
+                  setFormData({
+                    ...formData,
+                    assignedToId: value,
+                    autoAssign: false,
+                  })
                 }
+                disabled={formData.autoAssign}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Unassigned" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Unassigned</SelectItem>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
                   {project.team.members.map((member) => (
                     <SelectItem key={member.id} value={member.id}>
                       {member.name} ({member._count.tasks}/{member.capacity})
@@ -588,6 +596,27 @@ export default function ProjectDetailsPage() {
                   ))}
                 </SelectContent>
               </Select>
+              <div className="flex items-center gap-2 mt-2">
+                <Checkbox
+                  id="autoAssign"
+                  checked={formData.autoAssign}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      autoAssign: checked as boolean,
+                      assignedToId: checked
+                        ? "unassigned"
+                        : formData.assignedToId,
+                    })
+                  }
+                />
+                <Label
+                  htmlFor="autoAssign"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Auto-assign to member with least load
+                </Label>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="dueDate">Due Date (Optional)</Label>
