@@ -1,7 +1,7 @@
-import { TaskPriority, TaskStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { validateTaskAssignment } from "@/lib/team-utils";
 import { auth } from "@clerk/nextjs/server";
+import { TaskPriority, TaskStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 // GET a specific task

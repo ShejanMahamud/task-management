@@ -1,10 +1,10 @@
-import { TaskPriority, TaskStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import {
   findBestMemberForTask,
   validateTaskAssignment,
 } from "@/lib/team-utils";
 import { auth } from "@clerk/nextjs/server";
+import { TaskPriority, TaskStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 // GET all tasks with filtering
